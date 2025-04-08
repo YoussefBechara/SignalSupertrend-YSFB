@@ -1,0 +1,423 @@
+//@version=5
+indicator('Supertrend', overlay=true, format=format.price, precision=2, timeframe='')
+
+Periods = input(title='ATR Period', defval=10)
+src = input(hl2, title='Source')
+Multiplier = input.float(title='ATR Multiplier', step=0.1, defval=1.0)
+changeATR = input(title='Change ATR Calculation Method ?', defval=true)
+showsignals = input(title='Show Buy/Sell Signals ?', defval=true)
+highlighting = input(title='Highlighter On/Off ?', defval=true)
+atr2 = ta.sma(ta.tr, Periods)
+atr = changeATR ? ta.atr(Periods) : atr2
+up = src - Multiplier * atr
+up1 = nz(up[1], up)
+up := close[1] > up1 ? math.max(up, up1) : up
+dn = src + Multiplier * atr
+dn1 = nz(dn[1], dn)
+dn := close[1] < dn1 ? math.min(dn, dn1) : dn
+trend = 1
+trend := nz(trend[1], trend)
+trend := trend == -1 and close > dn1 ? 1 : trend == 1 and close < up1 ? -1 : trend
+upPlot = plot(trend == 1 ? up : na, title='Up Trend', style=plot.style_linebr, linewidth=2, color=color.new(color.green, 0))
+buySignal = trend == 1 and trend[1] == -1
+plotshape(buySignal ? up : na, title='UpTrend Begins', location=location.absolute, style=shape.circle, size=size.tiny, color=color.new(color.green, 0))
+// plotshape(buySignal and showsignals ? up : na, title="Buy", text="Buy", location=location.absolute, style=shape.labelup, size=size.tiny, color=color.green, textcolor=color.white, transp=0)
+dnPlot = plot(trend == 1 ? na : dn, title='Down Trend', style=plot.style_linebr, linewidth=2, color=color.new(color.red, 0))
+sellSignal = trend == -1 and trend[1] == 1
+plotshape(sellSignal ? dn : na, title='DownTrend Begins', location=location.absolute, style=shape.circle, size=size.tiny, color=color.new(color.red, 0))
+// plotshape(sellSignal and showsignals ? dn : na, title="Sell", text="Sell", location=location.absolute, style=shape.labeldown, size=size.tiny, color=color.red, textcolor=color.white, transp=0)
+mPlot = plot(ohlc4, title='', style=plot.style_circles, linewidth=0)
+longFillColor = highlighting ? trend == 1 ? color.green : color.white : color.white
+shortFillColor = highlighting ? trend == -1 ? color.red : color.white : color.white
+fill(mPlot, upPlot, title='UpTrend Highligter', color=longFillColor, transp=90)
+fill(mPlot, dnPlot, title='DownTrend Highligter', color=shortFillColor, transp=90)
+alertcondition(buySignal, title='SuperTrend Buy', message='SuperTrend Buy!')
+alertcondition(sellSignal, title='SuperTrend Sell', message='SuperTrend Sell!')
+changeCond = trend != trend[1]
+alertcondition(changeCond, title='SuperTrend Direction Change', message='SuperTrend has changed direction!')
+
+Periods2 = input(title='ATR Period', defval=12)
+src2 = input(hl2, title='Source')
+Multiplier2 = input.float(title='ATR Multiplier', step=0.1, defval=3.0)
+changeATR2 = input(title='Change ATR Calculation Method ?', defval=true)
+showsignals2 = input(title='Show Buy/Sell Signals ?', defval=true)
+highlighting2 = input(title='Highlighter On/Off ?', defval=true)
+atr22 = ta.sma(ta.tr, Periods2)
+atr23 = changeATR2 ? ta.atr(Periods2) : atr22
+up2 = src2 - Multiplier2 * atr23
+up12 = nz(up2[1], up2)
+up2 := close[1] > up12 ? math.max(up2, up12) : up2
+dn2 = src2 + Multiplier2 * atr23
+dn13 = nz(dn2[1], dn2)
+dn2 := close[1] < dn13 ? math.min(dn2, dn13) : dn2
+trend2 = 1
+trend2 := nz(trend2[1], trend2)
+trend2 := trend2 == -1 and close > dn13 ? 1 : trend2 == 1 and close < up12 ? -1 : trend2
+upPlot2 = plot(trend2 == 1 ? up2 : na, title='Up Trend', style=plot.style_linebr, linewidth=2, color=color.new(color.green, 0))
+buySignal2 = trend2 == 1 and trend2[1] == -1
+plotshape(buySignal2 ? up2 : na, title='UpTrend Begins', location=location.absolute, style=shape.circle, size=size.tiny, color=color.new(color.green, 0))
+// plotshape(buySignal2 and showsignals2 ? up2 : na, title="Buy", text="Buy", location=location.absolute, style=shape.labelup, size=size.tiny, color=color.green, textcolor=color.white, transp=0)
+dnPlot2 = plot(trend2 == 1 ? na : dn2, title='Down Trend', style=plot.style_linebr, linewidth=2, color=color.new(color.red, 0))
+sellSignal2 = trend2 == -1 and trend2[1] == 1
+plotshape(sellSignal2 ? dn2 : na, title='DownTrend Begins', location=location.absolute, style=shape.circle, size=size.tiny, color=color.new(color.red, 0))
+// plotshape(sellSignal2 and showsignals2 ? dn2 : na, title="Sell", text="Sell", location=location.absolute, style=shape.labeldown, size=size.tiny, color=color.red, textcolor=color.white, transp=0)
+mPlot2 = plot(ohlc4, title='', style=plot.style_circles, linewidth=0)
+longFillColor2 = highlighting2 ? trend2 == 1 ? color.green : color.white : color.white
+shortFillColor2 = highlighting2 ? trend2 == -1 ? color.red : color.white : color.white
+fill(mPlot2, upPlot2, title='UpTrend Highligter', color=longFillColor2, transp=90)
+fill(mPlot2, dnPlot2, title='DownTrend Highligter', color=shortFillColor2, transp=90)
+alertcondition(buySignal2, title='SuperTrend Buy', message='SuperTrend Buy!')
+alertcondition(sellSignal2, title='SuperTrend Sell', message='SuperTrend Sell!')
+changeCond2 = trend2 != trend2[1]
+alertcondition(changeCond2, title='SuperTrend Direction Change', message='SuperTrend has changed direction!')
+
+Periods23 = input(title='ATR Period', defval=11)
+src23 = input(hl2, title='Source')
+Multiplier23 = input.float(title='ATR Multiplier', step=0.1, defval=2.0)
+changeATR23 = input(title='Change ATR Calculation Method ?', defval=true)
+showsignals23 = input(title='Show Buy/Sell Signals ?', defval=true)
+highlighting23 = input(title='Highlighter On/Off ?', defval=true)
+atr223 = ta.sma(ta.tr, Periods23)
+atr233 = changeATR2 ? ta.atr(Periods23) : atr223
+up23 = src23 - Multiplier2 * atr23
+up123 = nz(up23[1], up23)
+up23 := close[1] > up123 ? math.max(up23, up123) : up23
+dn23 = src23 + Multiplier23 * atr233
+dn133 = nz(dn23[1], dn23)
+dn23 := close[1] < dn133 ? math.min(dn23, dn133) : dn23
+trend23 = 1
+trend23 := nz(trend23[1], trend23)
+trend23 := trend23 == -1 and close > dn133 ? 1 : trend23 == 1 and close < up123 ? -1 : trend23
+upPlot23 = plot(trend23 == 1 ? up23 : na, title='Up Trend', style=plot.style_linebr, linewidth=2, color=color.new(color.green, 0))
+buySignal23 = trend23 == 1 and trend23[1] == -1
+plotshape(buySignal23 ? up23 : na, title='UpTrend Begins', location=location.absolute, style=shape.circle, size=size.tiny, color=color.new(color.green, 0))
+// plotshape(buySignal23 and showsignals23 ? up23 : na, title="Buy", text="Buy", location=location.absolute, style=shape.labelup, size=size.tiny, color=color.green, textcolor=color.white, transp=0)
+dnPlot23 = plot(trend23 == 1 ? na : dn23, title='Down Trend', style=plot.style_linebr, linewidth=2, color=color.new(color.red, 0))
+sellSignal23 = trend23 == -1 and trend23[1] == 1
+plotshape(sellSignal23 ? dn23 : na, title='DownTrend Begins', location=location.absolute, style=shape.circle, size=size.tiny, color=color.new(color.red, 0))
+// plotshape(sellSignal23 and showsignals23 ? dn23 : na, title="Sell", text="Sell", location=location.absolute, style=shape.labeldown, size=size.tiny, color=color.red, textcolor=color.white, transp=0)
+mPlot23 = plot(ohlc4, title='', style=plot.style_circles, linewidth=0)
+longFillColor23 = highlighting23 ? trend23 == 1 ? color.green : color.white : color.white
+shortFillColor23 = highlighting23 ? trend23 == -1 ? color.red : color.white : color.white
+fill(mPlot23, upPlot23, title='UpTrend Highligter', color=longFillColor23, transp=90)
+fill(mPlot23, dnPlot23, title='DownTrend Highligter', color=shortFillColor23, transp=90)
+alertcondition(buySignal23, title='SuperTrend Buy', message='SuperTrend Buy!')
+alertcondition(sellSignal23, title='SuperTrend Sell', message='SuperTrend Sell!')
+changeCond23 = trend23 != trend23[1]
+alertcondition(changeCond23, title='SuperTrend Direction Change', message='SuperTrend has changed direction!')
+
+ema200 = ta.ema(close, 200)
+plot(ema200, title='200 EMA', color=color.new(color.blue, 0))
+
+// turningPeriods = input.int(9, minval=1, title='Tenkan-Sen')
+// standardPeriods = input.int(26, minval=1, title='Kinjun-Sen')
+// leadingSpan2Periods = input.int(52, minval=1, title='Senkou Span B')
+// displacement = input.int(26, minval=1, title='-ChinkouSpan/+SenkouSpan A')
+// scc = input(true, title='Show Cloud Color Change Based on Trend?')
+
+// donchian(len) =>
+//     math.avg(ta.lowest(len), ta.highest(len))
+// turning = donchian(turningPeriods)
+// standard = donchian(standardPeriods)
+// leadingSpan1 = math.avg(turning, standard)
+// leadingSpan2 = donchian(leadingSpan2Periods)
+
+// plot(turning, title='Tenkan-Sen (9 Period)', linewidth=4, color=color.new(#FF001A, 90))
+// plot(standard, title='Kinjun-Sen (26 Period)', linewidth=4, color=color.new(color.lime, 90))
+// //plot(close, title='Chinkou Span (Lagging Line)', linewidth=4, offset = -displacement, color=color.silver)
+
+// spanColor = scc and leadingSpan1 >= leadingSpan2 ? color.green : scc and leadingSpan1 < leadingSpan2 ? color.red : color.yellow
+
+// p1 = plot(leadingSpan1, title='Senkou Span A (26 Period) Cloud', style=plot.style_linebr, linewidth=1, offset=displacement, color=spanColor, transp=60)
+// p2 = plot(leadingSpan2, title='Senkou Span B (52 Period) Cloud', style=plot.style_linebr, linewidth=1, offset=displacement, color=spanColor, transp=60)
+
+// fill(p1, p2, color=color.new(color.purple, 90), title='Kumo (Cloud)')
+
+
+length_ema = input.int(100, minval=1, title="EMA Length")
+length_sma = input.int(200, minval=1, title="SMA Length")
+
+// Calculate Moving Averages
+ema_line = ta.ema(close, length_ema)
+sma_line = ta.sma(close, length_sma)
+
+// Plot Moving Average Lines
+plot(ema_line, color=color.new(color.blue, 30), linewidth=2, title="100 EMA")
+plot(sma_line, color=color.new(color.red, 30), linewidth=2, title="200 SMA")
+
+// Track crossover states
+var bool bullish_signal = false
+var bool bearish_signal = false
+var int last_crossover_bar = 0
+
+// Bullish Signal Logic (EMA crosses above SMA)
+bullish_condition = ta.crossover(ema_line, sma_line) and bar_index > last_crossover_bar + 5
+
+// Bearish Signal Logic (EMA crosses below SMA)
+bearish_condition = ta.crossunder(ema_line, sma_line) and bar_index > last_crossover_bar + 5
+
+// Plot Signals
+plotshape(bullish_condition, title="Buy Signal", location=location.belowbar, 
+          style=shape.triangleup, size=size.small, color=color.green)
+plotshape(bearish_condition, title="Sell Signal", location=location.abovebar, 
+          style=shape.triangledown, size=size.small, color=color.red)
+
+// Update signal tracking
+if (bullish_condition)
+    bullish_signal := true
+    bearish_signal := false
+    last_crossover_bar := bar_index
+
+if (bearish_condition)
+    bearish_signal := true
+    bullish_signal := false
+    last_crossover_bar := bar_index
+
+
+// Input settings for displaying individual lines and signals
+showTenkan = input(false, "Show Tenkan Line")
+showKijun = input(false, "Show Kijun Line")
+showSenkouA = input(true, "Show Senkou A Line")
+showSenkouB = input(true, "Show Senkou B Line")
+showChikou = input(false, "Show Chikou Line")
+strengthOptions = input.string("Strong", "Select Signal Strength", options=["Strong", "Weak", "Neutral", "All"])
+directionOptions = input.string("All", "Select Signal Direction", options=["Bullish", "Bearish", "All"])
+
+// Colors
+transparencyLevel = 95
+colorGreen = color.new(#36a336, 23)
+colorRed = color.new(#d82727, 47)
+colorTenkanViolet = color.new(#9400D3, 0)
+colorKijun = color.new(#fdd8a0, 0)
+colorLime = color.new(#006400, 0)
+colorMaroon = color.new(#8b0000, 0)
+colorGreenTransparent = color.new(colorGreen, transparencyLevel)
+colorRedTransparent = color.new(colorRed, transparencyLevel)
+
+// Periods input
+tenkanPeriods = input.int(9, "Tenkan", minval=1)
+kijunPeriods = input.int(26, "Kijun", minval=1)
+chikouPeriods = input.int(52, "Chikou", minval=1)
+displacement = input.int(26, "Offset", minval=1)
+
+// Donchian function
+donchian(len) => math.avg(ta.lowest(len), ta.highest(len))
+
+// Ichimoku calculations
+tenkan = donchian(tenkanPeriods)
+kijun = donchian(kijunPeriods)
+senkouA = math.avg(tenkan, kijun)
+senkouB = donchian(chikouPeriods)
+displacedSenkouA = senkouA[displacement - 1]
+displacedSenkouB = senkouB[displacement - 1]
+
+// Function to determine whether to display a given signal
+shouldDisplaySignal(signalStrength, signalDirection) =>
+    (strengthOptions == "All" or strengthOptions == signalStrength) and (directionOptions == "All" or directionOptions == signalDirection)
+
+// Signal calculations
+bullishSignal = ta.crossover(tenkan, kijun)
+bearishSignal = ta.crossunder(tenkan, kijun)
+
+bullishSignalValues = bullishSignal ? tenkan : na
+bearishSignalValues = bearishSignal ? tenkan : na
+
+strongBullishSignal = bullishSignalValues > displacedSenkouA and bullishSignalValues > displacedSenkouB and shouldDisplaySignal("Strong", "Bullish")
+neutralBullishSignal = ((bullishSignalValues > displacedSenkouA and bullishSignalValues < displacedSenkouB) or (bullishSignalValues < displacedSenkouA and bullishSignalValues > displacedSenkouB)) and shouldDisplaySignal("Neutral", "Bullish")
+weakBullishSignal = bullishSignalValues < displacedSenkouA and bullishSignalValues < displacedSenkouB and shouldDisplaySignal("Weak", "Bullish")
+
+strongBearishSignal = bearishSignalValues < displacedSenkouA and bearishSignalValues < displacedSenkouB and shouldDisplaySignal("Strong", "Bearish")
+neutralBearishSignal = ((bearishSignalValues > displacedSenkouA and bearishSignalValues < displacedSenkouB) or (bearishSignalValues < displacedSenkouA and bearishSignalValues > displacedSenkouB)) and shouldDisplaySignal("Neutral", "Bearish")
+weakBearishSignal = bearishSignalValues > displacedSenkouA and bearishSignalValues > displacedSenkouB and shouldDisplaySignal("Weak", "Bearish")
+
+// Plot Ichimoku lines
+// plot(showTenkan ? tenkan : na, color=colorTenkanViolet, title="Tenkan", linewidth=2)
+// plot(showKijun ? kijun : na, color=colorKijun, title="Kijun", linewidth=2)
+// plot(showChikou ? close : na, offset=-displacement, color=colorLime, title="Chikou", linewidth=1)
+
+// Plot Ichimoku lines with references for fill
+p1 = plot(showSenkouA ? senkouA : na, offset=displacement - 1, color=colorGreen, title="Senkou A", linewidth=1)
+p2 = plot(showSenkouB ? senkouB : na, offset=displacement - 1, color=colorRed, title="Senkou B", linewidth=1)
+
+// Conditional fill between Senkou A and B
+fill(p1, p2, color=senkouA > senkouB ? colorGreenTransparent : colorRedTransparent)
+
+// Plot shapes for signals with arrow and signal type indication
+plotshape(shouldDisplaySignal("Strong", "Bullish") and strongBullishSignal, style=shape.triangleup, location=location.belowbar, color=colorGreen, textcolor = colorGreen, text="Strong Bullish", title="Strong Bullish Signal")
+plotshape(shouldDisplaySignal("Strong", "Bearish") and strongBearishSignal, style=shape.triangledown, location=location.abovebar, color=colorRed, textcolor = colorRed, text="Strong Bearish", title="Strong Bearish Signal")
+plotshape(shouldDisplaySignal("Neutral", "Bullish") and neutralBullishSignal, style=shape.circle, location=location.belowbar, color=colorLime, textcolor = colorGreen, text="Neutral Bullish", title="Neutral Bullish Signal")
+plotshape(shouldDisplaySignal("Neutral", "Bearish") and neutralBearishSignal, style=shape.circle, location=location.abovebar, color=colorMaroon, textcolor = colorRed, text="Neutral Bearish", title="Neutral Bearish Signal")
+plotshape(shouldDisplaySignal("Weak", "Bullish") and weakBullishSignal, style=shape.diamond, location=location.belowbar, color=colorLime, textcolor = colorGreen, text="Weak Bullish", title="Weak Bullish Signal")
+plotshape(shouldDisplaySignal("Weak", "Bearish") and weakBearishSignal, style=shape.diamond, location=location.abovebar, color=colorMaroon, textcolor = colorRed, text="Weak Bearish", title="Weak Bearish Signal")
+
+// Define alert conditions
+alertcondition(strongBullishSignal, title='Strong Bullish Signal', message='{{exchange}}:{{ticker}} Strong Bullish Signal')
+alertcondition(strongBearishSignal, title='Strong Bearish Signal', message='{{exchange}}:{{ticker}} Strong Bearish Signal')
+alertcondition(neutralBullishSignal, title='Neutral Bullish Signal', message='{{exchange}}:{{ticker}} Neutral Bullish Signal')
+alertcondition(neutralBearishSignal, title='Neutral Bearish Signal', message='{{exchange}}:{{ticker}} Neutral Bearish Signal')
+alertcondition(weakBullishSignal, title='Weak Bullish Signal', message='{{exchange}}:{{ticker}} Weak Bullish Signal')
+alertcondition(weakBearishSignal, title='Weak Bearish Signal', message='{{exchange}}:{{ticker}} Weak Bearish Signal')
+
+
+//RSI
+// Input Parameters
+rsiLength = input.int(14, title="RSI Length")
+overBought = input.int(70, title="Overbought Level")
+overSold = input.int(30, title="Oversold Level")
+
+// RSI Calculation
+rsi = ta.rsi(close, rsiLength)
+
+// Detect RSI Crosses
+crossAbove = ta.crossover(rsi, overSold)
+crossBelow = ta.crossunder(rsi, overBought)
+
+// Plot Purple Triangles
+plotshape(crossAbove, style=shape.triangleup, color=color.white, location=location.belowbar, size=size.small, title="Buy Signal")
+plotshape(crossBelow, style=shape.triangledown, color=color.white, location=location.abovebar, size=size.small, title="Sell Signal")
+
+// Input
+lengthMA = input.int(34, title="Length MA")
+lengthSignal = input.int(9, title="Signal Length")
+showBuySell = input.bool(true, title="Show Buy/Sell Signals")
+
+// Functions
+calc_smma(src, len) =>
+    var smma = 0.0  // Initialize smma
+    smma := na(smma[1]) ? ta.sma(src, len) : (smma[1] * (len - 1) + src) / len
+    smma
+
+calc_zlema(src, length) =>
+    ema1 = ta.ema(src, length)
+    ema2 = ta.ema(ema1, length)
+    d = ema1 - ema2
+    ema1 + d
+
+
+hi = calc_smma(high, lengthMA)
+lo = calc_smma(low, lengthMA)
+mi = calc_zlema(src, lengthMA)
+
+md = (mi > hi) ? (mi - hi) : (mi < lo) ? (mi - lo) : 0
+sb = ta.sma(md, lengthSignal)
+sh = md - sb
+mdc = src > mi ? (src > hi ? color.lime : color.green) : (src < lo ? color.red : color.orange)
+
+// Buy and Sell Conditions
+buySignalMACD = ta.crossover(sh, sb) and md > 0
+sellSignalMACD = ta.crossunder(sh, sb) and md < 0
+
+// Plots
+// plot(0, color=color.gray, linewidth=1, title="MidLine")
+// plot(md, color=mdc, linewidth=2, title="ImpulseMACD", style=plot.style_histogram)
+// plot(sh, color=color.blue, linewidth=2, title="ImpulseHisto", style=plot.style_histogram)
+// plot(sb, color=color.maroon, linewidth=2, title="ImpulseMACDCDSignal")
+
+// Buy/Sell Signal Plots
+plotshape(series=buySignalMACD and showBuySell, style=shape.triangleup, location=location.belowbar, color=color.purple, size=size.small, title="Buy Signal")
+plotshape(series=sellSignalMACD and showBuySell, style=shape.triangledown, location=location.abovebar, color=color.purple, size=size.small, title="Sell Signal")
+
+// Enable bar colors
+ebc = input.bool(false, title="Enable bar colors")
+barcolor(ebc ? mdc : na)
+
+
+
+
+
+
+// Supertrend settings
+atrLength = input(10, title="ATR Period")
+atrMultiplier = input.float(3.0, title="ATR Multiplier")
+
+// Calculate ATR
+atrValue = ta.atr(atrLength)
+
+// Calculate Supertrend
+upTrend = close - atrMultiplier * atrValue
+downTrend = close + atrMultiplier * atrValue
+
+upTrend := close[1] > upTrend[1] ? math.max(upTrend, upTrend[1]) : upTrend
+downTrend := close[1] < downTrend[1] ? math.min(downTrend, downTrend[1]) : downTrend
+
+trendo = 1
+trendo := nz(trendo[1], trendo)
+trendo := trendo == -1 and close > downTrend[1] ? 1 : trendo == 1 and close < upTrend[1] ? -1 : trendo
+
+// Buy & Sell signals
+buySignalo = trendo == 1 and trendo[1] == -1
+sellSignalo = trendo == -1 and trendo[1] == 1
+
+// Use conditional plotting outside of logic blocks
+plotshape(buySignalo, location=location.belowbar, style=shape.triangleup, size=size.small, color=color.blue, title="Buy Signal")
+plotshape(sellSignalo, location=location.abovebar, style=shape.triangledown, size=size.small, color=color.orange, title="Sell Signal")
+
+// Plot Supertrend
+//plot(trend == 1 ? upTrend : na, title="Up Trend", color=color.green, linewidth=2)
+//plot(trend == -1 ? downTrend : na, title="Down Trend", color=color.red, linewidth=2)
+
+
+length = input.int(20, minval=1)
+maType = input.string("SMA", "Basis MA Type", options = ["SMA", "EMA", "SMMA (RMA)", "WMA", "VWMA"])
+srcz = input(close, title="Source")
+mult = input.float(2.0, minval=0.001, maxval=50, title="StdDev")
+
+ma(source, length, _type) =>
+    switch _type
+        "SMA" => ta.sma(source, length)
+        "EMA" => ta.ema(source, length)
+        "SMMA (RMA)" => ta.rma(source, length)
+        "WMA" => ta.wma(source, length)
+        "VWMA" => ta.vwma(source, length)
+
+basis = ma(srcz, length, maType)
+dev = mult * ta.stdev(srcz, length)
+upper = basis + dev
+lower = basis - dev
+offset = input.int(0, "Offset", minval = -500, maxval = 500, display = display.data_window)
+
+p1z = plot(upper, "Upper", color=color.rgb(252, 235, 0), offset = offset)
+p2z = plot(lower, "Lower", color=color.rgb(252, 235, 0), offset = offset)
+
+
+
+
+
+
+
+
+// Function for smoothed moving average
+smma(src, length) =>
+    var float smma = na
+    smma := na(smma[1]) ? ta.sma(src, length) : (smma[1] * (length - 1) + src) / length
+    smma
+
+// Input lengths and offsets
+jawLength = input.int(13, minval=1, title="Jaw Length")
+teethLength = input.int(8, minval=1, title="Teeth Length")
+lipsLength = input.int(5, minval=1, title="Lips Length")
+jawOffset = input.int(8, title="Jaw Offset")
+teethOffset = input.int(5, title="Teeth Offset")
+lipsOffset = input.int(3, title="Lips Offset")
+
+// Calculate Alligator lines
+jaw = smma(hl2, jawLength)
+teeth = smma(hl2, teethLength)
+lips = smma(hl2, lipsLength)
+
+// Plot the Alligator lines
+plot(jaw, "Jaw", offset = jawOffset, color=color.new(color.blue, 0))
+plot(teeth, "Teeth", offset = teethOffset, color=color.new(color.red, 0))
+plot(lips, "Lips", offset = lipsOffset, color=color.new(color.green, 0))
+
+// Detect Flat Market (Consolidation)
+atrFilter = ta.atr(14) < ta.sma(ta.atr(14), 50) // ATR below its moving average = low volatility
+alligatorFlat = math.abs(jaw - teeth) < ta.sma(math.abs(jaw - teeth), 50) and math.abs(teeth - lips) < ta.sma(math.abs(teeth - lips), 50) and atrFilter
+
+// Buy and Sell conditions (only when the market is not consolidating)
+buySignal1 = ta.crossover(lips, teeth) and not alligatorFlat
+sellSignal1 = ta.crossunder(lips, teeth) and not alligatorFlat
+
+// Plot bigger signals
+plotshape(buySignal1, location=location.belowbar, color=color.new(color.green, 0), style=shape.labelup, size=size.small, title="Buy Signal")
+plotshape(sellSignal1, location=location.abovebar, color=color.new(color.red, 0), style=shape.labeldown, size=size.small, title="Sell Signal")
